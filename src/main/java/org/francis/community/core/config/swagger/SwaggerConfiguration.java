@@ -49,8 +49,8 @@ public class SwaggerConfiguration {
     /**
      * 设置请求的统一前缀
      */
-    @Value("${swagger.pathMapping}")
-    private String pathMapping;
+/*    @Value("${swagger.pathMapping}")
+    private String pathMapping;*/
 
     /**
      * 创建API

@@ -2,6 +2,7 @@ package org.francis.community.core.config.mybatis;
 
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * @apiNote
  */
 @Configuration
+@MapperScan(basePackages = "")
 public class MybatisConfiguration {
     /**
      * mybatis拦截器配置
