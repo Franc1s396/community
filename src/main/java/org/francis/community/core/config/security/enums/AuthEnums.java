@@ -11,9 +11,9 @@ public enum AuthEnums {
      */
     PASS("/auth/pass", "用户密码登录"),
     /**
-     * 短信验证码登录
+     * 邮箱验证码登录
      */
-    SMS("/auth/sms", "短信验证码登录");
+    EMAIL("/auth/email", "邮箱验证码登录");
     private final String url;
     private final String name;
 

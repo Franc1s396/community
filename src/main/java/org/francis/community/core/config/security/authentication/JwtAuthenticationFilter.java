@@ -1,8 +1,12 @@
 package org.francis.community.core.config.security.authentication;
 
+import org.francis.community.core.config.security.authentication.pass.UsernamePasswordToken;
 import org.francis.community.core.model.LoginUser;
 import org.francis.community.core.utils.JwtUtils;
 import org.francis.community.core.utils.SecurityUtils;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -26,11 +30,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String bearerToken = request.getHeader(HEADER_AUTHORIZATION);
         // 解析token
         LoginUser loginUser = JwtUtils.getLoginUser(bearerToken);
-        boolean isAuthenticate = Objects.nonNull(SecurityUtils.getAuthentication());
         // 如果不为空
-        if (Objects.nonNull(loginUser) && !isAuthenticate) {
+        if (Objects.nonNull(loginUser) && Objects.isNull(SecurityUtils.getAuthentication())) {
             // 设置authentication
-
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(loginUser, null, null);
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }
         filterChain.doFilter(request, response);
     }
