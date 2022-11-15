@@ -2,11 +2,9 @@ package org.francis.community.core.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.francis.community.core.exception.security.TokenParseException;
 import org.francis.community.core.model.LoginUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.StringUtils;
 
 /**

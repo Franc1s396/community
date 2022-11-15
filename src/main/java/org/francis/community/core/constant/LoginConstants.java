@@ -6,5 +6,7 @@ package org.francis.community.core.constant;
  * @apiNote
  */
 public interface LoginConstants {
-    String LOGIN_USER_KEY="community:login:user";
+    String LOGIN_USER_KEY="community:login:user:";
+
+    String EMAIL_CODE_KEY="community:login:email:";
 }

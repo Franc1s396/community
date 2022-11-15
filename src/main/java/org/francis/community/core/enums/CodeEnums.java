@@ -10,7 +10,7 @@ public enum CodeEnums {
      * 测试
      */
     TEST(10000,"TEST"),
-    OAUTH_LOGIN_ERROR(51000,"授权登录失败")
+    EMAIL_ERROR(10001,"邮箱验证码发送失败，请联系管理员")
     ;
     private final Integer code;
     private final String message;
