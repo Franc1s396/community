@@ -47,12 +47,6 @@ public class SwaggerConfiguration {
     private boolean enabled;
 
     /**
-     * 设置请求的统一前缀
-     */
-/*    @Value("${swagger.pathMapping}")
-    private String pathMapping;*/
-
-    /**
      * 创建API
      */
     @Bean
