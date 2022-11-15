@@ -1,5 +1,8 @@
 # DH人人社区
 简易版论坛,还在开发中.
+## 功能
+1. 多种方式(用户名密码、邮箱)登录
+2. github第三方授权登录
 ## 技术栈 
 1. SpringBoot  
 2. SpringSecurity  
