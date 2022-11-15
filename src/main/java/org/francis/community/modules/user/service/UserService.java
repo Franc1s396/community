@@ -34,4 +34,11 @@ public interface UserService extends IService<User> {
      * @return 用户信息
      */
     User findByUsername(String username);
+
+    /**
+     * 根据email 查询用户
+     * @param email 邮箱
+     * @return 用户信息
+     */
+    User findByEmail(String email);
 }

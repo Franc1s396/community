@@ -1,4 +1,4 @@
-package org.francis.community.modules.login.model.dto;
+package org.francis.community.modules.login.dto;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import lombok.Data;
  * @apiNote
  */
 @Data
-public class AccessTokenDTO {
+public class GitHubAccessTokenDTO {
     private String clientId;
     private String clientSecret;
     private String state;

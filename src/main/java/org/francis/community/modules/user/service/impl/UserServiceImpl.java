@@ -25,8 +25,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public User findByUsername(String username) {
-        return getOne(queryWrapper()
-                .eq(User::getUsername, username));
+        return getOne(queryWrapper().eq(User::getUsername, username));
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        return getOne(queryWrapper().eq(User::getEmail,email));
     }
 
     @Override
