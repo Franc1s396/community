@@ -20,17 +20,17 @@ spring:
 
 # 邮件配置
   mail:
+    port: 465
     host: smtp.qq.com
-    protocol: smtp
+    protocol: smtps
     default-encoding: utf-8
     username: xxx@qq.com
-    password: xxxx
+    password: xxx
     properties:
       mail:
         stml:
           ssl:
             enable: true
-        debug: true
 
 # swagger 配置
 swagger:
