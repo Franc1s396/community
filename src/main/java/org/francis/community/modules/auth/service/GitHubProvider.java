@@ -43,7 +43,6 @@ public class GitHubProvider {
         map.put(GitHubConstants.STATE, gitHubAccessTokenDTO.getState());
         map.put(GitHubConstants.CODE, gitHubAccessTokenDTO.getCode());
         map.put(GitHubConstants.REDIRECT_URI, gitHubAccessTokenDTO.getRedirectUri());
-        log.info("map:{}", map);
         Map<String, String> accessTokenMap =
                 restTemplate.postForObject("https://github.com/login/oauth/access_token", map, Map.class);
 

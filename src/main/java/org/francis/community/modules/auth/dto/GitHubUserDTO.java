@@ -1,5 +1,6 @@
 package org.francis.community.modules.auth.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
@@ -11,5 +12,6 @@ import lombok.Data;
 public class GitHubUserDTO {
     private Long id;
     private String login;
+    @JsonProperty("avatar_url")
     private String avatarUrl;
 }

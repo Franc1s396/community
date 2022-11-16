@@ -60,11 +60,9 @@ public class OauthAuthorizeController {
 
         // 根据参数获取access_token
         String accessToken = gitHubProvider.getAccessToken(gitHubAccessTokenDTO);
-        log.info("github回调,access_token:{}", accessToken);
 
         // 根据access_token获取github用户信息
         GitHubUserDTO gitHubUserDTO = gitHubProvider.getUserInfoByAccessToken(accessToken);
-        log.info("github回调,userInfo:{}", gitHubUserDTO);
 
         // 将用户信息记录到数据库中
         UserDTO user=userService.findOauthUserByAccountId(gitHubUserDTO.getId());
@@ -73,7 +71,8 @@ public class OauthAuthorizeController {
             UserDTO userDTO = new UserDTO();
             userDTO.setAccountId(gitHubUserDTO.getId().toString());
             userDTO.setNickname(gitHubUserDTO.getLogin());
-            userDTO.setUsername(gitHubUserDTO.getLogin());
+            // 防止重复的username
+            userDTO.setUsername("github_"+gitHubUserDTO.getId());
             userDTO.setAvatarUrl(gitHubUserDTO.getAvatarUrl());
             user=userService.saveOauthUser(userDTO);
         }
@@ -87,6 +86,8 @@ public class OauthAuthorizeController {
         LoginSuccessResponse response = new LoginSuccessResponse();
         response.setUsername(user.getUsername());
         response.setToken(token);
+
+        log.info("github授权登录用户 id:{},username:{}",user.getId(),user.getUsername());
         return AjaxResult.success("登陆成功", response);
     }
 }
