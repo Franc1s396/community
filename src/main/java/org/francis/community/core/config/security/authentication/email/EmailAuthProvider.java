@@ -67,13 +67,13 @@ public class EmailAuthProvider implements AuthenticationProvider {
                 log.info("用户 id:{},username:{} 通过邮箱验证码方式登录成功", user.getId(), user.getUsername());
                 return new LoginSuccessToken(jwtToken, user.getUsername());
             } else {
-                throw new BadCredentialsException(AuthErrorEnums.passwordIncorrect.getName());
+                throw new BadCredentialsException(AuthErrorEnums.verifyCodeIncorrect.getName());
             }
         }
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return UsernamePasswordToken.class.isAssignableFrom(authentication);
+        return EmailAuthToken.class.isAssignableFrom(authentication);
     }
 }

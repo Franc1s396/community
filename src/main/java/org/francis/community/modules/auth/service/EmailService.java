@@ -1,9 +1,8 @@
-package org.francis.community.modules.login.service;
+package org.francis.community.modules.auth.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.francis.community.core.enums.CodeEnums;
 import org.francis.community.core.exception.EmailException;
-import org.francis.community.core.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.mail.javamail.JavaMailSender;

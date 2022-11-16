@@ -1,4 +1,4 @@
-package org.francis.community.modules.login.dto;
+package org.francis.community.modules.auth.dto;
 
 import lombok.Data;
 

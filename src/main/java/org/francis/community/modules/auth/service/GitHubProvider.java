@@ -1,12 +1,12 @@
-package org.francis.community.modules.login.service;
+package org.francis.community.modules.auth.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.francis.community.core.config.security.enums.AuthErrorEnums;
 import org.francis.community.core.exception.user.OauthLoginException;
-import org.francis.community.modules.login.constant.GitHubConstants;
-import org.francis.community.modules.login.dto.GitHubAccessTokenDTO;
-import org.francis.community.modules.login.dto.GitHubUserDTO;
+import org.francis.community.modules.auth.constant.GitHubConstants;
+import org.francis.community.modules.auth.dto.GitHubAccessTokenDTO;
+import org.francis.community.modules.auth.dto.GitHubUserDTO;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;

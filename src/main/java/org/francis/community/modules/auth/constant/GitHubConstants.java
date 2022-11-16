@@ -1,4 +1,4 @@
-package org.francis.community.modules.login.constant;
+package org.francis.community.modules.auth.constant;
 
 /**
  * @author Franc1s

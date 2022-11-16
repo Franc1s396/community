@@ -2,6 +2,8 @@ package org.francis.community.core.config.security;
 
 import lombok.extern.slf4j.Slf4j;
 import org.francis.community.core.config.security.authentication.JwtAuthenticationFilter;
+import org.francis.community.core.config.security.authentication.email.EmailAuthProcessFilter;
+import org.francis.community.core.config.security.authentication.email.EmailAuthProvider;
 import org.francis.community.core.config.security.authentication.pass.UsernamePasswordProcessFilter;
 import org.francis.community.core.config.security.authentication.pass.UsernamePasswordProvider;
 import org.francis.community.core.config.security.handler.AuthenticationEntryPointImpl;
@@ -33,6 +35,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private UsernamePasswordProvider usernamePasswordProvider;
 
     @Autowired
+    private EmailAuthProvider emailAuthProvider;
+
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
@@ -47,6 +52,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(usernamePasswordProvider);
+        auth.authenticationProvider(emailAuthProvider);
     }
 
     @Bean
@@ -57,6 +63,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     public UsernamePasswordProcessFilter usernamePasswordProcessFilter() {
         return new UsernamePasswordProcessFilter(authenticationManager, failureHandler, successHandler);
+    }
+
+    public EmailAuthProcessFilter emailAuthProcessFilter(){
+        return new EmailAuthProcessFilter(authenticationManager, failureHandler, successHandler);
     }
 
     public JwtAuthenticationFilter authenticationTokenFilterBean() throws Exception {
@@ -108,6 +118,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         httpSecurity
                 .addFilterBefore(usernamePasswordProcessFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(emailAuthProcessFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
     }
 }

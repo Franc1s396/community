@@ -1,4 +1,4 @@
-package org.francis.community.modules.login.controller;
+package org.francis.community.modules.auth.controller;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -6,10 +6,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.francis.community.core.config.security.authentication.LoginSuccessResponse;
 import org.francis.community.core.model.AjaxResult;
-import org.francis.community.modules.login.dto.GitHubAccessTokenDTO;
-import org.francis.community.modules.login.dto.GitHubUserDTO;
-import org.francis.community.modules.login.service.GitHubProvider;
+import org.francis.community.core.utils.JwtUtils;
+import org.francis.community.modules.auth.dto.GitHubAccessTokenDTO;
+import org.francis.community.modules.auth.dto.GitHubUserDTO;
+import org.francis.community.modules.auth.service.GitHubProvider;
 import org.francis.community.modules.user.model.dto.UserDTO;
 import org.francis.community.modules.user.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,6 +69,7 @@ public class OauthAuthorizeController {
         // 将用户信息记录到数据库中
         UserDTO user=userService.findOauthUserByAccountId(gitHubUserDTO.getId());
         if (Objects.isNull(user)) {
+            // 如果用户不存在则存入数据库中并返回用户信息
             UserDTO userDTO = new UserDTO();
             userDTO.setAccountId(gitHubUserDTO.getId().toString());
             userDTO.setNickname(gitHubUserDTO.getLogin());
@@ -79,10 +82,11 @@ public class OauthAuthorizeController {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getId());
         claims.put("username",user.getUsername());
-        String token = Jwts.builder()
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS512, "secret").compact();
+        String token = JwtUtils.createToken(claims);
 
-        return AjaxResult.success("登陆成功", token);
+        LoginSuccessResponse response = new LoginSuccessResponse();
+        response.setUsername(user.getUsername());
+        response.setToken(token);
+        return AjaxResult.success("登陆成功", response);
     }
 }

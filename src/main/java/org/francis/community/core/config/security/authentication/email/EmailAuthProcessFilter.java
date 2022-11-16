@@ -34,7 +34,7 @@ public class EmailAuthProcessFilter extends AbstractAuthenticationProcessingFilt
     public EmailAuthProcessFilter(AuthenticationManager authenticationManager,
                                          CustomAuthenticationFailureHandler failureHandler,
                                          CustomAuthenticationSuccessHandler successHandler) {
-        super(AuthEnums.PASS.getUrl(),authenticationManager);
+        super(AuthEnums.EMAIL.getUrl(),authenticationManager);
         this.failureHandler = failureHandler;
         this.successHandler = successHandler;
     }

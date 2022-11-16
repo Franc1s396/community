@@ -1,18 +1,16 @@
-package org.francis.community.modules.login.controller;
+package org.francis.community.modules.auth.controller;
 
 import com.google.code.kaptcha.Producer;
 import io.swagger.annotations.Api;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.francis.community.core.constant.LoginConstants;
 import org.francis.community.core.model.AjaxResult;
-import org.francis.community.modules.login.service.EmailService;
+import org.francis.community.modules.auth.service.EmailService;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 

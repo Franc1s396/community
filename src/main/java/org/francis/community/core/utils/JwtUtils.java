@@ -2,10 +2,13 @@ package org.francis.community.core.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.francis.community.core.model.LoginUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+
+import java.util.Map;
 
 /**
  * @author Franc1s
@@ -63,5 +66,16 @@ public class JwtUtils {
      */
     public static String getToken(String bearerToken) {
         return bearerToken.replace(TOKEN_PREFIX, "");
+    }
+
+    /**
+     * 生成token
+     * @param claims 信息map
+     * @return token
+     */
+    public static String createToken(Map<String, Object> claims) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .signWith(SignatureAlgorithm.HS512, "secret").compact();
     }
 }

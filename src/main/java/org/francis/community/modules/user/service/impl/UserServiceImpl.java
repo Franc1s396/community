@@ -1,6 +1,7 @@
 package org.francis.community.modules.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.francis.community.modules.user.model.User;
 import org.francis.community.modules.user.mapper.UserMapper;
 import org.francis.community.modules.user.model.dto.UserDTO;
@@ -20,6 +21,7 @@ import java.util.Objects;
  * @author francis
  * @since 2022-11-14
  */
+@Slf4j
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
@@ -56,6 +58,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = new User();
         BeanUtils.copyProperties(userDTO,user);
         save(user);
+        log.info("添加Oauth用户,user:{}",user);
         return userDTO;
     }
 
