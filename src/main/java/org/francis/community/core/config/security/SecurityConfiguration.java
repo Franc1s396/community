@@ -114,6 +114,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/configuration/ui").permitAll()
                 .antMatchers("/configuration/security").permitAll()
                 .antMatchers("/auth/**").permitAll()
+                .antMatchers("/callback/**").permitAll()
                 .anyRequest().authenticated();
 
         httpSecurity

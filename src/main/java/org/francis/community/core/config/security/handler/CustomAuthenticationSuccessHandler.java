@@ -28,7 +28,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         LoginSuccessToken token = (LoginSuccessToken) authentication;
         LoginSuccessResponse res = new LoginSuccessResponse();
-        res.setToken(token.getPrincipal().toString());
+        res.setToken("Bearer " + token.getPrincipal().toString());
         res.setUsername(token.getUsername());
         ObjectMapper objectMapper = new ObjectMapper();
         response.getOutputStream().write(objectMapper.writeValueAsBytes(AjaxResult.success(res)));

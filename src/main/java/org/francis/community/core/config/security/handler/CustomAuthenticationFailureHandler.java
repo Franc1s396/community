@@ -25,6 +25,6 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         ObjectMapper objectMapper = new ObjectMapper();
-        response.getOutputStream().write(objectMapper.writeValueAsBytes(AjaxResult.error("用户名或密码不正确")));
+        response.getOutputStream().write(objectMapper.writeValueAsBytes(AjaxResult.error(exception.getMessage())));
     }
 }

@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * @apiNote
  */
 @Configuration
-@MapperScan(basePackages = "org.francis.community.modules.user.mapper")
+@MapperScan(basePackages = "org.francis.community.modules.**.mapper")
 public class MybatisConfiguration {
     /**
      * mybatis拦截器配置
