@@ -20,7 +20,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("dh_user")
+@TableName("bbs_user")
 @ApiModel(value = "User对象", description = "")
 public class User implements Serializable {
 
@@ -47,6 +47,18 @@ public class User implements Serializable {
 
     @ApiModelProperty(value = "用户头像地址")
     private String avatarUrl;
+
+    @ApiModelProperty(value = "性别")
+    private String sex;
+
+    @ApiModelProperty(value = "个性签名")
+    private String remark;
+
+    @ApiModelProperty(value = "用户粉丝数量")
+    private Integer fans;
+
+    @ApiModelProperty(value = "用户关注数量")
+    private Integer concern;
 
     @ApiModelProperty(value = "第三方用户id")
     private String accountId;

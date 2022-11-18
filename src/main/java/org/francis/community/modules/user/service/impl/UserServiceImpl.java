@@ -1,6 +1,7 @@
 package org.francis.community.modules.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.francis.community.modules.user.model.User;
 import org.francis.community.modules.user.mapper.UserMapper;
@@ -11,7 +12,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -32,7 +36,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public User findByEmail(String email) {
-        return getOne(queryWrapper().eq(User::getEmail,email));
+        return getOne(queryWrapper().eq(User::getEmail, email));
+    }
+
+    @Override
+    public List<UserDTO> findUserListByIds(ArrayList<Long> userIds) {
+        List<User> userList = list(Wrappers.lambdaQuery(User.class).in(User::getId, userIds));
+        return userList.stream()
+                .map(user -> {
+                    UserDTO userDTO = new UserDTO();
+                    BeanUtils.copyProperties(user, userDTO);
+                    return userDTO;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public UserDTO findUserById(Long userId) {
+        User user = getOne(Wrappers.lambdaQuery(User.class).eq(User::getId, userId));
+        UserDTO userDTO = new UserDTO();
+        BeanUtils.copyProperties(user, userDTO);
+        return userDTO;
     }
 
     @Override
@@ -56,9 +80,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Transactional(rollbackFor = Exception.class)
     public UserDTO saveOauthUser(UserDTO userDTO) {
         User user = new User();
-        BeanUtils.copyProperties(userDTO,user);
+        BeanUtils.copyProperties(userDTO, user);
         save(user);
-        log.info("添加Oauth用户,user:{}",user);
+        log.info("添加Oauth用户,user:{}", user);
         return userDTO;
     }
 

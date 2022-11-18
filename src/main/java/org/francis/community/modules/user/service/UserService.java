@@ -4,6 +4,9 @@ import org.francis.community.modules.user.model.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.francis.community.modules.user.model.dto.UserDTO;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -41,4 +44,19 @@ public interface UserService extends IService<User> {
      * @return 用户信息
      */
     User findByEmail(String email);
+
+    /**
+     * 根据id列表查询用户列表
+     *
+     * @param userIds 用户id列表
+     * @return 用户列表
+     */
+    List<UserDTO> findUserListByIds(ArrayList<Long> userIds);
+
+    /**
+     * 根据id查询用户
+     * @param userId 用户id
+     * @return 用户信息
+     */
+    UserDTO findUserById(Long userId);
 }
