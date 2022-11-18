@@ -44,7 +44,7 @@ public class EmailAuthProvider implements AuthenticationProvider {
         String code = token.getCode();
 
         if (!StringUtils.hasText(email) || !StringUtils.hasText(code)) {
-            throw new BadCredentialsException(AuthErrorEnums.passwordIncorrect.getName());
+            throw new BadCredentialsException(AuthErrorEnums.verifyCodeIncorrect.getName());
         }
 
         User user = userService.findByEmail(email);
