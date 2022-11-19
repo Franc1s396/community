@@ -40,7 +40,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public List<UserDTO> findUserListByIds(ArrayList<Long> userIds) {
+    public List<UserDTO> findUserListByIds(List<Long> userIds) {
         List<User> userList = list(Wrappers.lambdaQuery(User.class).in(User::getId, userIds));
         return userList.stream()
                 .map(user -> {

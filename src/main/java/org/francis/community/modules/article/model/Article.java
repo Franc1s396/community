@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author francis
@@ -50,6 +50,9 @@ public class Article implements Serializable {
 
     @ApiModelProperty(value = "点赞数量")
     private Integer likeCount;
+
+    @ApiModelProperty(value = "点击量")
+    private Integer pageViewCount;
 
     @ApiModelProperty(value = "删除标志(0: 存在 1: 删除）")
     @TableLogic

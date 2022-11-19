@@ -2,6 +2,7 @@ package org.francis.community.modules.auth.controller;
 
 import com.google.code.kaptcha.Producer;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.francis.community.core.constant.LoginConstants;
@@ -36,6 +37,7 @@ public class EmailController {
     private final EmailService emailService;
 
     @GetMapping("/email/send-code")
+    @ApiOperation("邮箱验证码发送")
     public AjaxResult sendCode(@RequestParam String email) {
         // 验证是否存在code
         String code = redisTemplate.opsForValue().get(LoginConstants.EMAIL_CODE_KEY + email);

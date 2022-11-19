@@ -36,6 +36,8 @@ public class ArticleVO implements Serializable {
 
     private Integer likeCount;
 
+    private Integer pageViewCount;
+
     private LocalDateTime gmtCreate;
 
     private LocalDateTime gmtModified;

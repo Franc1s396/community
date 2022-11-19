@@ -3,11 +3,9 @@ package org.francis.community.modules.article.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.francis.community.core.enums.CodeEnums;
 import org.francis.community.core.exception.ServiceException;
 import org.francis.community.core.model.AjaxResult;
 import org.francis.community.core.model.request.PageQueryRequest;
@@ -17,14 +15,16 @@ import org.francis.community.modules.article.model.Tag;
 import org.francis.community.modules.article.model.request.ArticleQueryRequest;
 import org.francis.community.modules.article.model.request.CreateArticleRequest;
 import org.francis.community.modules.article.model.request.UpdateArticleRequest;
+import org.francis.community.modules.article.model.vo.ArticleInfoVO;
 import org.francis.community.modules.article.model.vo.ArticleVO;
 import org.francis.community.modules.article.service.ArticleService;
 import org.francis.community.modules.article.service.TagService;
-import org.francis.community.modules.user.model.User;
 import org.francis.community.modules.user.model.dto.UserDTO;
 import org.francis.community.modules.user.service.UserService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +34,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 /**
@@ -51,17 +50,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ArticleController {
 
+    private static final String ARTICLE_PV_PREFIX = "community:article:pv:";
+
     private final ArticleService articleService;
 
     private final TagService tagService;
 
     private final UserService userService;
 
+    private final StringRedisTemplate redisTemplate;
+
     private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @GetMapping("/list")
     @ApiOperation(value = "帖子分页查询")
-    public AjaxResult findArticlePageList(@Validated PageQueryRequest pageQueryRequest,
+    public AjaxResult findArticlePageList(PageQueryRequest pageQueryRequest,
                                           ArticleQueryRequest articleQueryRequest) throws ExecutionException, InterruptedException {
         IPage<Article> articlePageList = articleService.findArticlePageList(pageQueryRequest, articleQueryRequest);
         List<Article> articleList = articlePageList.getRecords();
@@ -108,18 +111,32 @@ public class ArticleController {
     @ApiOperation(value = "帖子详情")
     public AjaxResult findArticleInfo(@PathVariable Long articleId) {
         Article article = articleService.findArticleById(articleId);
+        if (Objects.isNull(article)) {
+            throw new ServiceException(CodeEnums.ARTICLE_NOT_FOUND.getCode(), CodeEnums.ARTICLE_NOT_FOUND.getMessage());
+        }
         UserDTO user = userService.findUserById(article.getUserId());
         Tag tag = tagService.findTagById(article.getTagId());
-        ArticleVO articleVO = new ArticleVO();
-        BeanUtils.copyProperties(article, articleVO);
-        articleVO.setNickname(user.getNickname());
-        articleVO.setAvatarUrl(user.getAvatarUrl());
-        articleVO.setTagName(tag.getName());
-        return AjaxResult.success(articleVO);
+
+        // 转换VO
+        ArticleInfoVO articleInfoVO = new ArticleInfoVO();
+        BeanUtils.copyProperties(article, articleInfoVO);
+        articleInfoVO.setNickname(user.getNickname());
+        articleInfoVO.setAvatarUrl(user.getAvatarUrl());
+        articleInfoVO.setTagName(tag.getName());
+
+        // 文章pv redis+mysql
+        String pageViewCount = redisTemplate.opsForValue().get(ARTICLE_PV_PREFIX + articleId);
+        if (StringUtils.hasText(pageViewCount)) {
+            articleInfoVO.setPageViewCount(articleInfoVO.getPageViewCount() + Integer.parseInt(pageViewCount));
+        }
+        // pv自增
+        redisTemplate.opsForValue().increment(ARTICLE_PV_PREFIX + articleId);
+
+        return AjaxResult.success(articleInfoVO);
     }
 
     @PostMapping("/create")
-    @ApiOperation(value = "创建帖子")
+    @ApiOperation(value = "发布帖子")
     public AjaxResult createArticle(@RequestBody @Validated CreateArticleRequest createArticleRequest) {
         // 参数校验
         Tag tag = tagService.findTagById(createArticleRequest.getTagId());
@@ -127,14 +144,15 @@ public class ArticleController {
             return AjaxResult.error("标签不存在");
         }
         // 创建帖子
-        boolean result = articleService.createArticle(createArticleRequest.getTitle(),
-                createArticleRequest.getContent(),
-                createArticleRequest.getTagId(),
-                SecurityUtils.getUserId());
-        if (result) {
-            return AjaxResult.success("创建成功");
-        }
-        return AjaxResult.error("创建失败");
+        String title = createArticleRequest.getTitle();
+        String content = createArticleRequest.getContent();
+        Long tagId = createArticleRequest.getTagId();
+        Long userId = SecurityUtils.getUserId();
+        articleService.createArticle(title, content, tagId, userId);
+
+        //TODO 为粉丝推送消息
+
+        return AjaxResult.error("发布成功");
     }
 
     @PutMapping("/update")
@@ -144,11 +162,8 @@ public class ArticleController {
         String title = updateArticleRequest.getTitle();
         String content = updateArticleRequest.getContent();
         Long tagId = updateArticleRequest.getTagId();
-        boolean result = articleService.updateArticle(articleId, title, content, tagId);
-        if (result) {
-            return AjaxResult.success("更新成功");
-        }
-        return AjaxResult.error("更新成功");
+        articleService.updateArticle(articleId, title, content, tagId);
+        return AjaxResult.success("更新成功");
     }
 
     @DeleteMapping("/remove/{articleId}")

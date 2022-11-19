@@ -51,7 +51,7 @@ public interface UserService extends IService<User> {
      * @param userIds 用户id列表
      * @return 用户列表
      */
-    List<UserDTO> findUserListByIds(ArrayList<Long> userIds);
+    List<UserDTO> findUserListByIds(List<Long> userIds);
 
     /**
      * 根据id查询用户

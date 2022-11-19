@@ -2,8 +2,8 @@ package org.francis.community.modules.auth.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.francis.community.core.config.security.enums.AuthErrorEnums;
-import org.francis.community.core.exception.user.OauthLoginException;
+import org.francis.community.core.enums.AuthErrorEnums;
+import org.francis.community.core.exception.security.OauthLoginException;
 import org.francis.community.modules.auth.constant.GitHubConstants;
 import org.francis.community.modules.auth.dto.GitHubAccessTokenDTO;
 import org.francis.community.modules.auth.dto.GitHubUserDTO;

@@ -18,35 +18,29 @@ import java.time.LocalDateTime;
  * @since 2022-11-17
  */
 @Data
-public class ArticleInfoVO implements Serializable {
+public class CommentVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty(value = "一级评论id")
     private Long id;
 
-    private String title;
-
+    @ApiModelProperty(value = "评论内容")
     private String content;
 
-    private Long tagId;
-
-    private String tagName;
-
+    @ApiModelProperty(value = "用户id")
     private Long userId;
 
-    private String nickname;
+    @ApiModelProperty(value = "用户昵称")
+    private String userNickname;
 
-    private String avatarUrl;
+    @ApiModelProperty(value = "用户头像地址")
+    private String userAvatarUrl;
 
-    private Integer commentCount;
+    @ApiModelProperty(value = "文章id")
+    private Long articleId;
 
-    private Integer likeCount;
-
-    private Integer pageViewCount;
-
+    @ApiModelProperty(value = "创建时间")
     private LocalDateTime gmtCreate;
-
-    private LocalDateTime gmtModified;
-
 
 }

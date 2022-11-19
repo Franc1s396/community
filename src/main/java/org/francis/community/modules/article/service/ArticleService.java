@@ -23,9 +23,8 @@ public interface ArticleService extends IService<Article> {
      * @param content 帖子内容
      * @param tagId   帖子标签id
      * @param userId  用户id
-     * @return 创建结果
      */
-    boolean createArticle(String title, String content, Long tagId, Long userId);
+    void createArticle(String title, String content, Long tagId, Long userId);
 
     /**
      * 分页查询帖子
@@ -50,5 +49,12 @@ public interface ArticleService extends IService<Article> {
      * @param tagId 帖子标签id
      * @return 更新结果
      */
-    boolean updateArticle(Long articleId, String title, String content, Long tagId);
+    void updateArticle(Long articleId, String title, String content, Long tagId);
+
+    /**
+     * 更新帖子评论数量
+     * @param articleId 帖子id
+     * @return 更新结果
+     */
+    void incrementCommentCount(Long articleId);
 }
