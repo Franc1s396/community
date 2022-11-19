@@ -1,4 +1,4 @@
-package org.francis.community.core.exception.user;
+package org.francis.community.core.exception.security;
 
 /**
  * @author Franc1s

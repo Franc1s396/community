@@ -28,6 +28,7 @@ public class GlobalExceptionHandler {
      * 权限校验异常
      */
     @ExceptionHandler(AccessDeniedException.class)
+    @SuppressWarnings("all")
     public AjaxResult handleAccessDeniedException(AccessDeniedException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',权限校验失败'{}'", requestURI, e.getMessage());
@@ -38,6 +39,7 @@ public class GlobalExceptionHandler {
      * 请求方式不支持
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @SuppressWarnings("all")
     public AjaxResult handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException e,
                                                           HttpServletRequest request) {
         String requestURI = request.getRequestURI();
@@ -49,8 +51,8 @@ public class GlobalExceptionHandler {
      * 业务异常
      */
     @ExceptionHandler(ServiceException.class)
-    public AjaxResult handleServiceException(ServiceException e, HttpServletRequest request) {
-        log.error(e.getMessage(), e);
+    public AjaxResult handleServiceException(ServiceException e) {
+        log.error("发生业务异常,code:{},message:{}",e.getCode(), e.getMessage());
         Integer code = e.getCode();
         return StringUtils.hasText(code.toString()) ? AjaxResult.error(code, e.getMessage()) : AjaxResult.error(e.getMessage());
     }
@@ -59,6 +61,7 @@ public class GlobalExceptionHandler {
      * 拦截未知的运行时异常
      */
     @ExceptionHandler(RuntimeException.class)
+    @SuppressWarnings("all")
     public AjaxResult handleRuntimeException(RuntimeException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',发生未知异常.", requestURI, e);
@@ -69,6 +72,7 @@ public class GlobalExceptionHandler {
      * 系统异常
      */
     @ExceptionHandler(Exception.class)
+    @SuppressWarnings("all")
     public AjaxResult handleException(Exception e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',发生系统异常.", requestURI, e);
@@ -89,6 +93,7 @@ public class GlobalExceptionHandler {
      * 自定义验证异常
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
+    @SuppressWarnings("all")
     public Object handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error(e.getMessage(), e);
         String message = e.getBindingResult().getFieldError().getDefaultMessage();

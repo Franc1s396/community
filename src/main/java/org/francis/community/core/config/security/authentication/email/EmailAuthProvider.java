@@ -5,8 +5,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.francis.community.core.config.security.authentication.LoginSuccessToken;
-import org.francis.community.core.config.security.authentication.pass.UsernamePasswordToken;
-import org.francis.community.core.config.security.enums.AuthErrorEnums;
+import org.francis.community.core.enums.AuthErrorEnums;
 import org.francis.community.core.constant.LoginConstants;
 import org.francis.community.modules.user.model.User;
 import org.francis.community.modules.user.service.UserService;
@@ -15,7 +14,6 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 

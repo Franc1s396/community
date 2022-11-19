@@ -1,14 +1,12 @@
 package org.francis.community.core.config.security.authentication.email;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.francis.community.core.config.security.authentication.pass.UsernamePasswordToken;
-import org.francis.community.core.config.security.enums.AuthEnums;
-import org.francis.community.core.config.security.enums.AuthErrorEnums;
+import org.francis.community.core.enums.AuthEnums;
+import org.francis.community.core.enums.AuthErrorEnums;
 import org.francis.community.core.config.security.handler.CustomAuthenticationFailureHandler;
 import org.francis.community.core.config.security.handler.CustomAuthenticationSuccessHandler;
 import org.francis.community.core.exception.security.MethodNotSupportException;
 import org.francis.community.core.model.request.EmailLoginRequest;
-import org.francis.community.core.model.request.PasswordLoginRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;

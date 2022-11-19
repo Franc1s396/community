@@ -1,4 +1,4 @@
-package org.francis.community.core.config.security.enums;
+package org.francis.community.core.enums;
 
 /**
  * @author Franc1s

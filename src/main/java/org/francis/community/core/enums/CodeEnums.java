@@ -7,10 +7,15 @@ package org.francis.community.core.enums;
  */
 public enum CodeEnums {
     /**
-     * 测试
+     * 用户不存在
      */
-    TEST(10000,"TEST"),
-    EMAIL_ERROR(10001,"邮箱验证码发送失败，请联系管理员")
+    USER_NOT_FOUND(10000,"用户不存在~"),
+    EMAIL_ERROR(10001,"邮箱验证码发送失败，请联系管理员"),
+    PARAM_ERROR(10002,"参数有误,请检查"),
+    ARTICLE_NOT_FOUND(10003,"帖子不存在了，换一篇看看吧~"),
+    COMMENT_NOT_FOUND(10004,"评论消失了~"),
+    TAG_NOT_FOUND(10005,"标签不存在了~"),
+
     ;
     private final Integer code;
     private final String message;

@@ -2,8 +2,8 @@ package org.francis.community.core.config.security.authentication.pass;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.francis.community.core.config.security.enums.AuthEnums;
-import org.francis.community.core.config.security.enums.AuthErrorEnums;
+import org.francis.community.core.enums.AuthEnums;
+import org.francis.community.core.enums.AuthErrorEnums;
 import org.francis.community.core.config.security.handler.CustomAuthenticationFailureHandler;
 import org.francis.community.core.config.security.handler.CustomAuthenticationSuccessHandler;
 import org.francis.community.core.exception.security.MethodNotSupportException;
