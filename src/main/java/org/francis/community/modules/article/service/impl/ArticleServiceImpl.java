@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.francis.community.core.enums.CodeEnums;
 import org.francis.community.core.exception.ServiceException;
 import org.francis.community.core.model.request.PageQueryRequest;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -41,10 +44,17 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     private final TagMapper tagMapper;
 
+    private final SqlSessionFactory sqlSessionFactory;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createArticle(String title, String content, Long tagId, Long userId) {
+        Tag tag = tagMapper.selectOne(Wrappers.lambdaQuery(Tag.class).eq(Tag::getId, tagId));
+        if (Objects.isNull(tag)) {
+            throw new ServiceException(CodeEnums.TAG_NOT_FOUND.getCode(), CodeEnums.TAG_NOT_FOUND.getMessage());
+        }
+
         Article article = new Article();
         article.setTitle(title);
         article.setContent(content);
@@ -105,6 +115,36 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         update(Wrappers.lambdaUpdate(Article.class)
                 .eq(Article::getId, articleId)
                 .setSql("comment_count=comment_count+1"));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void removeArticle(Long articleId) {
+        // 检验帖子是否存在 && 是否属于登录用户
+        Article article = findArticleById(articleId);
+
+        if (Objects.isNull(article)) {
+            throw new ServiceException(CodeEnums.ARTICLE_NOT_FOUND.getCode(), CodeEnums.ARTICLE_NOT_FOUND.getMessage());
+        }
+
+        if (!Objects.equals(article.getUserId(), SecurityUtils.getUserId())) {
+            throw new ServiceException(CodeEnums.DELETE_ERROR.getCode(), CodeEnums.DELETE_ERROR.getMessage());
+        }
+        articleMapper.deleteById(articleId);
+        log.info("用户id:{},删除文章id:{}", SecurityUtils.getUserId(), articleId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateBatchLikeCount(List<Article> articleList) {
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        ArticleMapper sessionMapper = sqlSession.getMapper(ArticleMapper.class);
+        for (Article article : articleList) {
+            sessionMapper.updateLikeCount(article);
+        }
+        sqlSession.commit();
+        log.info("批量更新帖子点赞数量 更新数量:{}", articleList.size());
+        sqlSession.close();
     }
 
 }

@@ -6,6 +6,8 @@ import org.francis.community.modules.article.model.Article;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.francis.community.modules.article.model.request.ArticleQueryRequest;
 
+import java.util.List;
+
 /**
  * <p>
  * 服务类
@@ -57,4 +59,12 @@ public interface ArticleService extends IService<Article> {
      * @return 更新结果
      */
     void incrementCommentCount(Long articleId);
+
+    /**
+     * 删除帖子
+     * @param articleId 帖子id
+     */
+    void removeArticle(Long articleId);
+
+    void updateBatchLikeCount(List<Article> articleList);
 }

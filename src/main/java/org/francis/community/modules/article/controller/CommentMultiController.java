@@ -88,12 +88,9 @@ public class CommentMultiController {
             throw new ServiceException(CodeEnums.COMMENT_NOT_FOUND.getCode(), CodeEnums.COMMENT_NOT_FOUND.getMessage());
         }
 
-        boolean result=commentMultiService.createCommentMulti(commentId,content, userId);
+        commentMultiService.createCommentMulti(commentId,content, userId);
 
-        if (result) {
-            return AjaxResult.success("发布成功");
-        }
-        return AjaxResult.error();
+        return AjaxResult.success("发布成功");
     }
 
     @DeleteMapping("/remove/{commentMultiId}")

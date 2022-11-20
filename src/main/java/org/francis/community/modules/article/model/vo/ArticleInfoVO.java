@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.francis.community.modules.article.model.Like;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -41,6 +42,8 @@ public class ArticleInfoVO implements Serializable {
     private Integer commentCount;
 
     private Integer likeCount;
+
+    private Boolean likeStatus;
 
     private Integer pageViewCount;
 

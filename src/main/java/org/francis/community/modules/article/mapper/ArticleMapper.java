@@ -1,5 +1,6 @@
 package org.francis.community.modules.article.mapper;
 
+import org.apache.ibatis.annotations.Param;
 import org.francis.community.modules.article.model.Article;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -13,4 +14,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ArticleMapper extends BaseMapper<Article> {
 
+    int updateLikeCount(@Param("article") Article article);
 }

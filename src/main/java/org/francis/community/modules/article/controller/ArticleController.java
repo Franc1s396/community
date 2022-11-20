@@ -11,6 +11,7 @@ import org.francis.community.core.model.AjaxResult;
 import org.francis.community.core.model.request.PageQueryRequest;
 import org.francis.community.core.utils.SecurityUtils;
 import org.francis.community.modules.article.model.Article;
+import org.francis.community.modules.article.model.Like;
 import org.francis.community.modules.article.model.Tag;
 import org.francis.community.modules.article.model.request.ArticleQueryRequest;
 import org.francis.community.modules.article.model.request.CreateArticleRequest;
@@ -18,6 +19,7 @@ import org.francis.community.modules.article.model.request.UpdateArticleRequest;
 import org.francis.community.modules.article.model.vo.ArticleInfoVO;
 import org.francis.community.modules.article.model.vo.ArticleVO;
 import org.francis.community.modules.article.service.ArticleService;
+import org.francis.community.modules.article.service.LikeService;
 import org.francis.community.modules.article.service.TagService;
 import org.francis.community.modules.user.model.dto.UserDTO;
 import org.francis.community.modules.user.service.UserService;
@@ -61,6 +63,8 @@ public class ArticleController {
     private final StringRedisTemplate redisTemplate;
 
     private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
+    private final LikeService likeService;
 
     @GetMapping("/list")
     @ApiOperation(value = "帖子分页查询")
@@ -116,6 +120,7 @@ public class ArticleController {
         }
         UserDTO user = userService.findUserById(article.getUserId());
         Tag tag = tagService.findTagById(article.getTagId());
+        boolean likeStatus=likeService.isLike(articleId);
 
         // 转换VO
         ArticleInfoVO articleInfoVO = new ArticleInfoVO();
@@ -123,6 +128,7 @@ public class ArticleController {
         articleInfoVO.setNickname(user.getNickname());
         articleInfoVO.setAvatarUrl(user.getAvatarUrl());
         articleInfoVO.setTagName(tag.getName());
+        articleInfoVO.setLikeStatus(likeStatus);
 
         // 文章pv redis+mysql
         String pageViewCount = redisTemplate.opsForValue().get(ARTICLE_PV_PREFIX + articleId);
@@ -138,11 +144,6 @@ public class ArticleController {
     @PostMapping("/create")
     @ApiOperation(value = "发布帖子")
     public AjaxResult createArticle(@RequestBody @Validated CreateArticleRequest createArticleRequest) {
-        // 参数校验
-        Tag tag = tagService.findTagById(createArticleRequest.getTagId());
-        if (Objects.isNull(tag)) {
-            return AjaxResult.error("标签不存在");
-        }
         // 创建帖子
         String title = createArticleRequest.getTitle();
         String content = createArticleRequest.getContent();
@@ -169,16 +170,8 @@ public class ArticleController {
     @DeleteMapping("/remove/{articleId}")
     @ApiOperation(value = "删除帖子")
     public AjaxResult removeArticle(@PathVariable Long articleId) {
-        Article article = articleService.findArticleById(articleId);
-        // 检验帖子是否存在 && 是否属于登录用户
-        boolean flag = Objects.nonNull(article) && Objects.equals(article.getUserId(), SecurityUtils.getUserId());
-        if (flag) {
-            boolean result = articleService.removeById(articleId);
-            if (result) {
-                return AjaxResult.success("删除成功");
-            }
-        }
-        return AjaxResult.error("删除失败");
+        articleService.removeArticle(articleId);
+        return AjaxResult.success("删除成功");
     }
 }
 
