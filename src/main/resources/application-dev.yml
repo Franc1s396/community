@@ -32,6 +32,10 @@ spring:
             enable: true
         debug: true
 
+logging:
+  level:
+    org.francis.community: debug
+
 # swagger 配置
 swagger:
   title: DH人人社区
