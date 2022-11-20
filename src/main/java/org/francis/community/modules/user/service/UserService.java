@@ -59,4 +59,10 @@ public interface UserService extends IService<User> {
      * @return 用户信息
      */
     UserDTO findUserById(Long userId);
+
+    /**
+     * 保存用户
+     * @param user 用户参数
+     */
+    void saveUser(User user);
 }

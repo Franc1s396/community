@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.francis.community.modules.article.mapper.LikeMapper">
+    <update id="updateBatchLike" parameterType="list">
+        UPDATE bbs_like
+        SET status=0
+        WHERE (article_id,user_id) IN
+        <foreach collection="likeList" index="index" item="item"
+                 separator="," open="(" close=")">
+            (#{item.articleId},#{item.userId})
+        </foreach>
+    </update>
+</mapper>

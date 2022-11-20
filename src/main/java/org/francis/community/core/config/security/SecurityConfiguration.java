@@ -20,6 +20,8 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -49,6 +51,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomAuthenticationFailureHandler failureHandler;
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(usernamePasswordProvider);
@@ -65,7 +72,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return new UsernamePasswordProcessFilter(authenticationManager, failureHandler, successHandler);
     }
 
-    public EmailAuthProcessFilter emailAuthProcessFilter(){
+    public EmailAuthProcessFilter emailAuthProcessFilter() {
         return new EmailAuthProcessFilter(authenticationManager, failureHandler, successHandler);
     }
 

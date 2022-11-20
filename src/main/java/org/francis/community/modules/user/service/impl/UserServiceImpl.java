@@ -2,7 +2,10 @@ package org.francis.community.modules.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.francis.community.core.enums.CodeEnums;
+import org.francis.community.core.exception.ServiceException;
 import org.francis.community.modules.user.model.User;
 import org.francis.community.modules.user.mapper.UserMapper;
 import org.francis.community.modules.user.model.dto.UserDTO;
@@ -27,21 +30,24 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+
+    private final UserMapper userMapper;
 
     @Override
     public User findByUsername(String username) {
-        return getOne(queryWrapper().eq(User::getUsername, username));
+        return userMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getUsername, username));
     }
 
     @Override
     public User findByEmail(String email) {
-        return getOne(queryWrapper().eq(User::getEmail, email));
+        return userMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getEmail, email));
     }
 
     @Override
     public List<UserDTO> findUserListByIds(List<Long> userIds) {
-        List<User> userList = list(Wrappers.lambdaQuery(User.class).in(User::getId, userIds));
+        List<User> userList = userMapper.selectList(Wrappers.lambdaQuery(User.class).in(User::getId, userIds));
         return userList.stream()
                 .map(user -> {
                     UserDTO userDTO = new UserDTO();
@@ -53,22 +59,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public UserDTO findUserById(Long userId) {
-        User user = getOne(Wrappers.lambdaQuery(User.class).eq(User::getId, userId));
+        User user = userMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getId, userId));
+        if (Objects.isNull(user)) {
+            throw new ServiceException(CodeEnums.USER_NOT_FOUND.getCode(), CodeEnums.USER_NOT_FOUND.getMessage());
+        }
+
         UserDTO userDTO = new UserDTO();
         BeanUtils.copyProperties(user, userDTO);
         return userDTO;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveUser(User user) {
+        User validUser = findByUsername(user.getUsername());
+        if (Objects.nonNull(validUser)) {
+            throw new ServiceException(CodeEnums.USERNAME_TAKEN.getCode(), CodeEnums.USERNAME_TAKEN.getMessage());
+        }
+
+        userMapper.insert(user);
+    }
+
+    @Override
     public UserDTO findOauthUserByAccountId(Long accountId) {
         // 根据accountId查询数据库
-        LambdaQueryWrapper<User> queryWrapper = queryWrapper()
-                .eq(User::getAccountId, accountId);
-        User user = getOne(queryWrapper);
+        User user = userMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getAccountId, accountId));
 
         // 如果没有则返回空
         if (Objects.isNull(user)) {
-            return null;
+            throw new ServiceException(CodeEnums.USER_NOT_FOUND.getCode(), CodeEnums.USER_NOT_FOUND.getMessage());
         }
 
         UserDTO userDTO = new UserDTO();
@@ -81,12 +100,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public UserDTO saveOauthUser(UserDTO userDTO) {
         User user = new User();
         BeanUtils.copyProperties(userDTO, user);
-        save(user);
+        userMapper.insert(user);
         log.info("添加Oauth用户,user:{}", user);
         return userDTO;
     }
 
-    private LambdaQueryWrapper<User> queryWrapper() {
-        return new LambdaQueryWrapper<>();
-    }
 }
