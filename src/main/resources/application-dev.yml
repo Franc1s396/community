@@ -4,7 +4,7 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: ma321388
+    password: xxx
     url: jdbc:mysql:///dh_community?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
   redis:
     # 地址
@@ -30,8 +30,8 @@ spring:
     host: smtp.qq.com
     protocol: smtp
     default-encoding: utf-8
-    username: 714954230@qq.com
-    password: gyartbrrfxsxbdjc
+    username: xxx@qq.com
+    password: xxx
     properties:
       mail:
         stml:
@@ -53,7 +53,7 @@ swagger:
 # github第三方登录配置
 github:
   client:
-    id: 562f3f4c493527c1d44d
-    secret: f221a3ce2ade6161d3807fe74bbc9ccc7bf9f4f3
+    id: xx
+    secret: xx
   redirect:
     uri: http://localhost:8080/callback/github
