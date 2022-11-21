@@ -11,11 +11,14 @@ import org.francis.community.core.enums.CodeEnums;
 import org.francis.community.core.exception.ServiceException;
 import org.francis.community.core.model.request.PageQueryRequest;
 import org.francis.community.core.utils.SecurityUtils;
+import org.francis.community.modules.article.convert.ArticleConvert;
 import org.francis.community.modules.article.mapper.TagMapper;
 import org.francis.community.modules.article.model.Article;
 import org.francis.community.modules.article.mapper.ArticleMapper;
 import org.francis.community.modules.article.model.Tag;
 import org.francis.community.modules.article.model.request.ArticleQueryRequest;
+import org.francis.community.modules.article.model.request.CreateArticleRequest;
+import org.francis.community.modules.article.model.request.UpdateArticleRequest;
 import org.francis.community.modules.article.service.ArticleService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -46,22 +49,25 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     private final SqlSessionFactory sqlSessionFactory;
 
+    private final ArticleConvert articleConvert;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createArticle(String title, String content, Long tagId, Long userId) {
-        Tag tag = tagMapper.selectOne(Wrappers.lambdaQuery(Tag.class).eq(Tag::getId, tagId));
+    public Article createArticle(CreateArticleRequest createArticleRequest) {
+        Long userId = SecurityUtils.getUserId();
+
+        Tag tag = tagMapper.selectOne(Wrappers.lambdaQuery(Tag.class).eq(Tag::getId, createArticleRequest.getTagId()));
         if (Objects.isNull(tag)) {
             throw new ServiceException(CodeEnums.TAG_NOT_FOUND.getCode(), CodeEnums.TAG_NOT_FOUND.getMessage());
         }
 
-        Article article = new Article();
-        article.setTitle(title);
-        article.setContent(content);
-        article.setTagId(tagId);
-        article.setUserId(userId);
+        Article article = articleConvert.request2Entity(createArticleRequest, userId);
+
         articleMapper.insert(article);
-        log.info("创建帖子,用户id:{},帖子id:{},帖子标题:{}", userId, article.getUserId(), title);
+        log.info("创建帖子,用户id:{},帖子id:{},帖子标题:{}", userId, article.getId(), createArticleRequest.getTitle());
+
+        return article;
     }
 
     @Override
@@ -88,26 +94,25 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateArticle(Long articleId, String title, String content, Long tagId) {
-        Article article = findArticleById(articleId);
+    public void updateArticle(UpdateArticleRequest updateArticleRequest) {
+        Article article = findArticleById(updateArticleRequest.getId());
         if (Objects.isNull(article)) {
             throw new ServiceException(CodeEnums.ARTICLE_NOT_FOUND.getCode(), CodeEnums.ARTICLE_NOT_FOUND.getMessage());
         }
 
-        Tag tag = tagMapper.selectOne(Wrappers.lambdaQuery(Tag.class).eq(Tag::getId, tagId));
+        Tag tag = tagMapper.selectOne(Wrappers.lambdaQuery(Tag.class).eq(Tag::getId, updateArticleRequest.getTagId()));
         if (Objects.isNull(tag)) {
             throw new ServiceException(CodeEnums.TAG_NOT_FOUND.getCode(), CodeEnums.TAG_NOT_FOUND.getMessage());
         }
 
         Long userId = SecurityUtils.getUserId();
         String username = SecurityUtils.getUsername();
-        articleMapper.update(article, Wrappers.lambdaUpdate(Article.class)
-                .eq(Article::getId, articleId)
-                .set(StringUtils.hasText(title), Article::getTitle, title)
-                .set(StringUtils.hasText(content), Article::getContent, content)
-                .set(Objects.nonNull(tagId), Article::getTagId, tagId));
 
-        log.info("用户id:{},username:{},更新了帖子 id:{}", userId, username, articleId);
+        articleConvert.updateRequest2Entity(updateArticleRequest, article);
+
+        articleMapper.updateById(article);
+
+        log.info("用户id:{},username:{},更新了帖子 id:{}", userId, username, article.getId());
     }
 
     @Override

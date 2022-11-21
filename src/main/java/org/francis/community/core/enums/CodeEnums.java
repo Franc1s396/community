@@ -16,7 +16,9 @@ public enum CodeEnums {
     COMMENT_NOT_FOUND(10004, "评论消失了~"),
     TAG_NOT_FOUND(10005, "标签不存在了~"),
     DELETE_ERROR(10006, "您无权删除这条数据~"),
-    USERNAME_TAKEN(10007, "用户名已被占用~");
+    USERNAME_TAKEN(10007, "用户名已被占用~"),
+    ATTENTION_ERROR(10008,"关注出现异常，请重新刷新页面~")
+    ;
     private final Integer code;
     private final String message;
 

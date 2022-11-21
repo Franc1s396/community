@@ -10,8 +10,9 @@ import org.francis.community.core.exception.ServiceException;
 import org.francis.community.core.model.AjaxResult;
 import org.francis.community.core.model.request.PageQueryRequest;
 import org.francis.community.core.utils.SecurityUtils;
+import org.francis.community.modules.article.convert.ArticleConvert;
+import org.francis.community.modules.article.listener.ArticlePublishEvent;
 import org.francis.community.modules.article.model.Article;
-import org.francis.community.modules.article.model.Like;
 import org.francis.community.modules.article.model.Tag;
 import org.francis.community.modules.article.model.request.ArticleQueryRequest;
 import org.francis.community.modules.article.model.request.CreateArticleRequest;
@@ -21,9 +22,11 @@ import org.francis.community.modules.article.model.vo.ArticleVO;
 import org.francis.community.modules.article.service.ArticleService;
 import org.francis.community.modules.article.service.LikeService;
 import org.francis.community.modules.article.service.TagService;
+import org.francis.community.modules.attention.service.AttentionService;
 import org.francis.community.modules.user.model.dto.UserDTO;
 import org.francis.community.modules.user.service.UserService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
@@ -66,6 +69,12 @@ public class ArticleController {
 
     private final LikeService likeService;
 
+    private final ArticleConvert articleConvert;
+
+    private final ApplicationContext applicationContext;
+
+    private final AttentionService attentionService;
+
     @GetMapping("/list")
     @ApiOperation(value = "帖子分页查询")
     public AjaxResult findArticlePageList(PageQueryRequest pageQueryRequest,
@@ -92,19 +101,24 @@ public class ArticleController {
         IPage<ArticleVO> articleVOPageList = articlePageList.convert(article -> {
             ArticleVO articleVO = new ArticleVO();
             BeanUtils.copyProperties(article, articleVO);
+
             // 标签过滤
             Tag tag = tagList.stream()
                     .filter(tag1 -> Objects.equals(articleVO.getTagId(), tag1.getId()))
                     .findFirst()
-                    .orElseThrow(() -> new ServiceException("标签未找到"));
+                    .get();
+
             articleVO.setTagName(tag.getName());
+
             // 用户列表过滤
             UserDTO userDTO = userList.stream()
                     .filter(user -> Objects.equals(articleVO.getUserId(), user.getId()))
                     .findFirst()
-                    .orElseThrow(() -> new ServiceException("用户未找到"));
+                    .get();
+
             articleVO.setNickname(userDTO.getNickname());
             articleVO.setAvatarUrl(userDTO.getAvatarUrl());
+
             return articleVO;
         });
 
@@ -120,15 +134,10 @@ public class ArticleController {
         }
         UserDTO user = userService.findUserById(article.getUserId());
         Tag tag = tagService.findTagById(article.getTagId());
-        boolean likeStatus=likeService.isLike(articleId);
+        boolean likeStatus = likeService.isLike(articleId);
 
         // 转换VO
-        ArticleInfoVO articleInfoVO = new ArticleInfoVO();
-        BeanUtils.copyProperties(article, articleInfoVO);
-        articleInfoVO.setNickname(user.getNickname());
-        articleInfoVO.setAvatarUrl(user.getAvatarUrl());
-        articleInfoVO.setTagName(tag.getName());
-        articleInfoVO.setLikeStatus(likeStatus);
+        ArticleInfoVO articleInfoVO = articleConvert.entity2VO(article, user, tag.getName(), likeStatus);
 
         // 文章pv redis+mysql
         String pageViewCount = redisTemplate.opsForValue().get(ARTICLE_PV_PREFIX + articleId);
@@ -145,13 +154,14 @@ public class ArticleController {
     @ApiOperation(value = "发布帖子")
     public AjaxResult createArticle(@RequestBody @Validated CreateArticleRequest createArticleRequest) {
         // 创建帖子
-        String title = createArticleRequest.getTitle();
-        String content = createArticleRequest.getContent();
-        Long tagId = createArticleRequest.getTagId();
-        Long userId = SecurityUtils.getUserId();
-        articleService.createArticle(title, content, tagId, userId);
+        Article article = articleService.createArticle(createArticleRequest);
 
-        //TODO 为粉丝推送消息
+        // 采用推模式-为粉丝推送消息(异步/分批推送)
+        ArticlePublishEvent publishEvent = new ArticlePublishEvent();
+        Long userId = SecurityUtils.getUserId();
+        publishEvent.setUserId(userId);
+        publishEvent.setArticleId(article.getId());
+        applicationContext.publishEvent(publishEvent);
 
         return AjaxResult.error("发布成功");
     }
@@ -159,11 +169,7 @@ public class ArticleController {
     @PutMapping("/update")
     @ApiOperation(value = "更新帖子")
     public AjaxResult updateArticle(@RequestBody @Validated UpdateArticleRequest updateArticleRequest) {
-        Long articleId = updateArticleRequest.getId();
-        String title = updateArticleRequest.getTitle();
-        String content = updateArticleRequest.getContent();
-        Long tagId = updateArticleRequest.getTagId();
-        articleService.updateArticle(articleId, title, content, tagId);
+        articleService.updateArticle(updateArticleRequest);
         return AjaxResult.success("更新成功");
     }
 

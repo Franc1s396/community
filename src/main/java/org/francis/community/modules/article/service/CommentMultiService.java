@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.francis.community.core.model.request.PageQueryRequest;
 import org.francis.community.modules.article.model.CommentMulti;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.francis.community.modules.article.model.request.CommentMultiCreateRequest;
 
 /**
  * <p>
@@ -23,7 +24,8 @@ public interface CommentMultiService extends IService<CommentMulti> {
      */
     IPage<CommentMulti> findCommentMultiPageList(PageQueryRequest pageQueryRequest, Long commentId);
 
-    void createCommentMulti(Long commentId, String content, Long userId);
 
     CommentMulti findCommentMultiById(Long commentMultiId);
+
+    void createCommentMulti(CommentMultiCreateRequest commentCreateRequest);
 }

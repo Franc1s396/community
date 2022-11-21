@@ -5,6 +5,8 @@ import org.francis.community.core.model.request.PageQueryRequest;
 import org.francis.community.modules.article.model.Article;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.francis.community.modules.article.model.request.ArticleQueryRequest;
+import org.francis.community.modules.article.model.request.CreateArticleRequest;
+import org.francis.community.modules.article.model.request.UpdateArticleRequest;
 
 import java.util.List;
 
@@ -20,17 +22,13 @@ public interface ArticleService extends IService<Article> {
 
     /**
      * 创建帖子
-     *
-     * @param title   帖子标题
-     * @param content 帖子内容
-     * @param tagId   帖子标签id
-     * @param userId  用户id
      */
-    void createArticle(String title, String content, Long tagId, Long userId);
+    Article createArticle(CreateArticleRequest createArticleRequest);
 
     /**
      * 分页查询帖子
-     * @param pageQueryRequest 分页参数
+     *
+     * @param pageQueryRequest    分页参数
      * @param articleQueryRequest 帖子查询参数
      * @return 帖子分页
      */
@@ -38,23 +36,15 @@ public interface ArticleService extends IService<Article> {
 
     /**
      * 根据id查询帖子
+     *
      * @param articleId 帖子id
      * @return 帖子信息
      */
     Article findArticleById(Long articleId);
 
     /**
-     * 更新帖子
-     * @param articleId 帖子id
-     * @param title 帖子标题
-     * @param content 帖子内容
-     * @param tagId 帖子标签id
-     * @return 更新结果
-     */
-    void updateArticle(Long articleId, String title, String content, Long tagId);
-
-    /**
      * 更新帖子评论数量
+     *
      * @param articleId 帖子id
      * @return 更新结果
      */
@@ -62,9 +52,12 @@ public interface ArticleService extends IService<Article> {
 
     /**
      * 删除帖子
+     *
      * @param articleId 帖子id
      */
     void removeArticle(Long articleId);
 
     void updateBatchLikeCount(List<Article> articleList);
+
+    void updateArticle(UpdateArticleRequest updateArticleRequest);
 }
