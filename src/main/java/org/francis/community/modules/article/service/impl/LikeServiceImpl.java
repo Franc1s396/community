@@ -34,7 +34,7 @@ public class LikeServiceImpl extends ServiceImpl<LikeMapper, Like> implements Li
     /**
      * 记录所有点赞或取消点赞记录
      */
-    private static final String LIKE_HASH_KEY = "community:article:like";
+    private static final String LIKE_HASH_KEY = "community:article:like:hash";
     /**
      * 记录帖子点赞计数
      */
@@ -55,8 +55,11 @@ public class LikeServiceImpl extends ServiceImpl<LikeMapper, Like> implements Li
         String hashKey = articleId + "::" + userId;
 
         // 如果hash中存在并且是点赞状态 则不做任何操作
+        Like like = likeMapper.findLikeData(articleId, userId);
         String code = (String) redisTemplate.opsForHash().get(LIKE_HASH_KEY, hashKey);
-        if (StringUtils.hasText(code) && LikeEnums.LIKE.getCode().equals(Integer.parseInt(code))) {
+        boolean valid = StringUtils.hasText(code) && LikeEnums.LIKE.getCode().equals(Integer.parseInt(code))
+                || Objects.nonNull(like);
+        if (valid) {
             return;
         }
 
@@ -70,8 +73,11 @@ public class LikeServiceImpl extends ServiceImpl<LikeMapper, Like> implements Li
         String hashKey = articleId + "::" + userId;
 
         // 如果hash中存在并且是点赞状态 则不做任何操作
+        Like like = likeMapper.findLikeData(articleId, userId);
         String code = (String) redisTemplate.opsForHash().get(LIKE_HASH_KEY, hashKey);
-        if (StringUtils.hasText(code) && LikeEnums.CANCEL_LIKE.getCode().equals(Integer.parseInt(code))) {
+        boolean valid = StringUtils.hasText(code) && LikeEnums.CANCEL_LIKE.getCode().equals(Integer.parseInt(code))
+                || Objects.nonNull(like);
+        if (valid) {
             return;
         }
 
@@ -90,9 +96,7 @@ public class LikeServiceImpl extends ServiceImpl<LikeMapper, Like> implements Li
             return LikeEnums.LIKE.getCode().equals(Integer.parseInt(code));
         } else {
             //查mysql
-            Like like = likeMapper.selectOne(Wrappers.lambdaQuery(Like.class)
-                    .eq(Like::getArticleId, articleId)
-                    .eq(Like::getUserId, userId));
+            Like like = likeMapper.selectOne(Wrappers.lambdaQuery(Like.class).eq(Like::getArticleId, articleId).eq(Like::getUserId, userId));
             return like.getStatus();
         }
     }

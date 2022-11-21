@@ -10,6 +10,7 @@ import org.francis.community.modules.article.service.LikeService;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -40,7 +41,9 @@ public class ArticleLikeTask {
 
     /**
      * redis定时落盘到MySQL
+     * 时间随便定的
      */
+    @Scheduled(cron = "0 0 0/12 * * ?")
     public void articleLikeTask() {
         log.info("定时任务持久化点赞数据开始");
         // 获取hash所有数据

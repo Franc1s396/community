@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 /**
  * @author francis
  */
-@EnableAsync
 @EnableScheduling
 @SpringBootApplication
 public class CommunityApplication {
