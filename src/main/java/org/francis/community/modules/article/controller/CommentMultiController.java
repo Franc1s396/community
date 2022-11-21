@@ -53,7 +53,7 @@ public class CommentMultiController {
     @GetMapping("/list")
     @ApiOperation("分页查询二级评论")
     public AjaxResult findCommentMultiPageList(PageQueryRequest pageQueryRequest,
-                                               @RequestParam Long commentId){
+                                               @RequestParam Long commentId) {
 
         IPage<CommentMulti> commentMultiPageList = commentMultiService.findCommentMultiPageList(pageQueryRequest, commentId);
         List<CommentMulti> commentMultiRecords = commentMultiPageList.getRecords();
@@ -67,7 +67,7 @@ public class CommentMultiController {
             UserDTO user = userList.stream()
                     .filter(userDTO -> Objects.equals(userDTO.getId(), commentMulti.getUserId()))
                     .findFirst()
-                    .orElseThrow(() -> new ServiceException("用户未找到"));
+                    .get();
             commentMultiVO.setUserNickname(user.getNickname());
             commentMultiVO.setUserAvatarUrl(user.getAvatarUrl());
             return commentMultiVO;
@@ -78,17 +78,15 @@ public class CommentMultiController {
 
     @PostMapping("/create")
     @ApiOperation("发布二级评论")
-    public AjaxResult createComment(@RequestBody @Validated CommentMultiCreateRequest commentCreateRequest){
-        String content = commentCreateRequest.getContent();
+    public AjaxResult createComment(@RequestBody @Validated CommentMultiCreateRequest commentCreateRequest) {
         Long commentId = commentCreateRequest.getCommentId();
-        Long userId = SecurityUtils.getUserId();
 
         Comment comment = commentService.findCommentById(commentId);
         if (Objects.isNull(comment)) {
             throw new ServiceException(CodeEnums.COMMENT_NOT_FOUND.getCode(), CodeEnums.COMMENT_NOT_FOUND.getMessage());
         }
 
-        commentMultiService.createCommentMulti(commentId,content, userId);
+        commentMultiService.createCommentMulti(commentCreateRequest);
 
         return AjaxResult.success("发布成功");
     }

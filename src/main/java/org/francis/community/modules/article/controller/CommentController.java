@@ -62,17 +62,21 @@ public class CommentController {
 
         IPage<Comment> commentPageList = commentService.findCommentPageList(pageQueryRequest, commentQueryRequest);
         List<Comment> commentRecords = commentPageList.getRecords();
+
         // 获取用户id集合
         Set<Long> userIds = commentRecords.stream().map(Comment::getUserId).collect(Collectors.toSet());
         List<UserDTO> userList = userService.findUserListByIds(new ArrayList<>(userIds));
+
         // page转换
         IPage<CommentVO> commentVOPageList = commentPageList.convert(comment -> {
             CommentVO commentVO = new CommentVO();
             BeanUtils.copyProperties(comment, commentVO);
+
             UserDTO user = userList.stream()
                     .filter(userDTO -> Objects.equals(userDTO.getId(), comment.getUserId()))
                     .findFirst()
-                    .orElseThrow(() -> new ServiceException("用户未找到"));
+                    .get();
+
             commentVO.setUserNickname(user.getNickname());
             commentVO.setUserAvatarUrl(user.getAvatarUrl());
             return commentVO;
@@ -84,11 +88,9 @@ public class CommentController {
     @PostMapping("/create")
     @ApiOperation("发布一级评论")
     public AjaxResult createComment(@RequestBody @Validated CommentCreateRequest commentCreateRequest) {
-        String content = commentCreateRequest.getContent();
         Long articleId = commentCreateRequest.getArticleId();
-        Long userId = SecurityUtils.getUserId();
         // 添加一级评论
-        commentService.createComment(articleId, content, userId);
+        commentService.createComment(commentCreateRequest);
         // 更新文章评论数量
         articleService.incrementCommentCount(articleId);
 

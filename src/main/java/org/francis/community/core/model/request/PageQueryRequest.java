@@ -11,10 +11,10 @@ import javax.validation.constraints.NotNull;
 @Data
 public class PageQueryRequest {
 
-	@ApiModelProperty(value="分页页数",required = true)
-	private Integer page = 1;
+    @ApiModelProperty(value = "分页页数", required = true)
+    private Integer page = 1;
 
-	@ApiModelProperty(value="每页条数",required = true)
-	private Integer limit = 10;
+    @ApiModelProperty(value = "每页条数", required = true)
+    private Integer limit = 10;
 
 }

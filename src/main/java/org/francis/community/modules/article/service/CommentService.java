@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.francis.community.core.model.request.PageQueryRequest;
 import org.francis.community.modules.article.model.Comment;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.francis.community.modules.article.model.request.CommentCreateRequest;
 import org.francis.community.modules.article.model.request.CommentQueryRequest;
 
 /**
@@ -24,14 +25,6 @@ public interface CommentService extends IService<Comment> {
      */
     IPage<Comment> findCommentPageList(PageQueryRequest pageQueryRequest, CommentQueryRequest commentQueryRequest);
 
-    /**
-     * 发布一级评论
-     *
-     * @param articleId 帖子id
-     * @param content   一级评论内容
-     * @param userId    用户id
-     */
-    void createComment(Long articleId, String content, Long userId);
 
     /**
      * 根据id查询一级评论
@@ -39,4 +32,6 @@ public interface CommentService extends IService<Comment> {
      * @return 一级评论
      */
     Comment findCommentById(Long commentId);
+
+    void createComment(CommentCreateRequest commentCreateRequest);
 }

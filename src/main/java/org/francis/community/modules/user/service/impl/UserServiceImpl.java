@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.francis.community.core.enums.CodeEnums;
 import org.francis.community.core.exception.ServiceException;
 import org.francis.community.modules.user.model.User;
@@ -47,6 +48,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public List<UserDTO> findUserListByIds(List<Long> userIds) {
+        if (CollectionUtils.isEmpty(userIds)) {
+            return null;
+        }
         List<User> userList = userMapper.selectList(Wrappers.lambdaQuery(User.class).in(User::getId, userIds));
         return userList.stream()
                 .map(user -> {

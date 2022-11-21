@@ -8,10 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.francis.community.core.enums.CodeEnums;
 import org.francis.community.core.exception.ServiceException;
 import org.francis.community.core.model.request.PageQueryRequest;
+import org.francis.community.core.utils.SecurityUtils;
+import org.francis.community.modules.article.convert.CommentConvert;
 import org.francis.community.modules.article.mapper.ArticleMapper;
 import org.francis.community.modules.article.model.Article;
 import org.francis.community.modules.article.model.Comment;
 import org.francis.community.modules.article.mapper.CommentMapper;
+import org.francis.community.modules.article.model.request.CommentCreateRequest;
 import org.francis.community.modules.article.model.request.CommentQueryRequest;
 import org.francis.community.modules.article.service.CommentService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -38,6 +41,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     private final ArticleMapper articleMapper;
 
+    private final CommentConvert commentConvert;
+
     @Override
     public IPage<Comment> findCommentPageList(PageQueryRequest pageQueryRequest, CommentQueryRequest commentQueryRequest) {
         Page<Comment> commentPage = new Page<>(pageQueryRequest.getPage(), pageQueryRequest.getLimit());
@@ -53,21 +58,16 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createComment(Long articleId, String content, Long userId) {
-        boolean paramValidation = Objects.nonNull(articleId) && StringUtils.hasText(content) && Objects.nonNull(userId);
-        if (!paramValidation) {
-            throw new ServiceException(CodeEnums.PARAM_ERROR.getCode(), CodeEnums.PARAM_ERROR.getMessage());
-        }
+    public void createComment(CommentCreateRequest commentCreateRequest) {
+        Long userId = SecurityUtils.getUserId();
+        Long articleId = commentCreateRequest.getArticleId();
 
         Article article = articleMapper.selectOne(Wrappers.lambdaQuery(Article.class).eq(Article::getId, articleId));
         if (Objects.isNull(article)) {
             throw new ServiceException(CodeEnums.ARTICLE_NOT_FOUND.getCode(), CodeEnums.ARTICLE_NOT_FOUND.getMessage());
         }
 
-        Comment comment = new Comment();
-        comment.setArticleId(articleId);
-        comment.setContent(content);
-        comment.setUserId(userId);
+        Comment comment =commentConvert.createRequest2Entity(commentCreateRequest, userId);
 
         commentMapper.insert(comment);
         log.info("用户发布评论 userId:{},文章id:{},评论id:{}", userId, articleId, comment.getId());
